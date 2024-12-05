@@ -1,4 +1,5 @@
 Flask
 openai
 python-telegram-bot
-sqlite3
+psycopg2-binary
+python-dotenv
