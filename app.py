@@ -3,15 +3,24 @@ from openai import OpenAI
 from datetime import datetime
 import os
 import sqlite3
+from psycopg2.extras import DictCursor
+from dotenv import load_dotenv
+
+# Wczytywanie zmiennych środowiskowych z pliku .env
+load_dotenv()
+
+# Ścieżka do PostgreSQL z .env
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Ścieżka do pliku bazy danych
-DATABASE = "data/logs.db"
+# DATABASE = "data/logs.db"
 
 # Inicjalizacja aplikacji Flask
 app = Flask(__name__)
 
 # Klucz API OpenAI
-client = OpenAI(api_key="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")  # Wstaw tutaj swój klucz API
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 # Tworzenie tabeli, jeśli nie istnieje
@@ -74,21 +83,23 @@ def log_interaction():
         print("Validation failed: Input or output missing")  # Debugowanie
         return jsonify({"error": "Input and output are required"}), 400
 
-    # Zapis do bazy danych
+    # Zapis do bazy danych PostgreSQL
     try:
-        conn = sqlite3.connect(DATABASE)
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO logs (user_id, input, output)
-            VALUES (?, ?, ?)
+            VALUES (%s, %s, %s)
         ''', (user_id, user_input, output))
         conn.commit()
+        cursor.close()
         conn.close()
     except Exception as e:
         print("Database error:", str(e))  # Debugowanie
         return jsonify({"error": str(e)}), 500
 
     return jsonify({"status": "success", "message": "Logged successfully"})
+
 
 
 @app.route('/test-log')
@@ -109,7 +120,8 @@ def test_log():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.getenv("PORT", 5000))  # Render udostępnia PORT w zmiennych środowiskowych
+    app.run(host="0.0.0.0", port=port)
 
 
 
