@@ -23,20 +23,21 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 
-# Tworzenie tabeli, jeśli nie istnieje
+# Funkcja tworzenia tabeli, jeśli nie istnieje
 def init_db():
-    conn = sqlite3.connect(DATABASE)
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            id SERIAL PRIMARY KEY,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             user_id TEXT NOT NULL,
             input TEXT NOT NULL,
             output TEXT NOT NULL
         )
     ''')
     conn.commit()
+    cursor.close()
     conn.close()
 
 init_db()
