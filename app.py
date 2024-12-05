@@ -101,6 +101,35 @@ def log_interaction():
 
     return jsonify({"status": "success", "message": "Logged successfully"})
 
+@app.route('/record-count', methods=['GET'])
+def record_count():
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    cursor = conn.cursor()
+    cursor.execute('SELECT COUNT(*) FROM logs')
+    count = cursor.fetchone()[0]
+    cursor.close()
+    conn.close()
+    return jsonify({"record_count": count})
+
+
+@app.route('/show-logs', methods=['GET'])
+def show_logs():
+    try:
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        cursor = conn.cursor()
+        # Pobieramy wszystkie rekordy z tabeli logs
+        cursor.execute('SELECT * FROM logs')
+        rows = cursor.fetchall()
+        # Pobieramy nazwy kolumn, aby sformatować dane
+        column_names = [desc[0] for desc in cursor.description]
+        # Zamieniamy dane na listę słowników
+        results = [dict(zip(column_names, row)) for row in rows]
+        cursor.close()
+        conn.close()
+        return jsonify({"logs": results})
+    except Exception as e:
+        print("Error fetching logs:", str(e))
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/test-log')
