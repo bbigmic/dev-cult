@@ -3,3 +3,4 @@ openai
 python-telegram-bot
 psycopg2-binary
 python-dotenv
+gunicorn
