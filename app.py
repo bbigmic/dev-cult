@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify, render_template
 from openai import OpenAI
 from datetime import datetime
+import psycopg2
 import os
-import sqlite3
 from psycopg2.extras import DictCursor
 from dotenv import load_dotenv
 
