@@ -1,0 +1,232 @@
+/* Globalne stylizacje */
+body {
+  background: #121212;
+  color: #0f0;
+  font-family: monospace;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+}
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin-bottom: 40px;
+  z-index: 2;
+}
+.hero h1 {
+  font-size: 3rem;
+  color: #0f0;
+  margin: 0;
+  text-shadow: 0 0 20px #0f0;
+}
+.hero p {
+  font-size: 1.2rem;
+  color: #0f0;
+  margin: 10px 0 20px;
+}
+.hero button {
+  background: #0f0;
+  color: #000;
+  border: 1px solid #0f0;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+.hero button:hover {
+  background: #0c0;
+}
+
+/* Konsola */
+.console-container {
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid #0f0;
+  padding: 20px;
+  width: 600px;
+  max-width: 90%;
+  box-shadow: 0 0 15px #0f0;
+  position: relative;
+  z-index: 1;
+}
+.console-output {
+  height: 200px;
+  overflow-y: auto;
+  background: #121212;
+  color: #0f0;
+  padding: 10px;
+  border: 1px solid #0f0;
+  margin-bottom: 10px;
+}
+.console-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  position: relative;
+}
+.placeholder-animation {
+  position: absolute; /* Wewnątrz kontekstu .console-input */
+  top: 50%; /* Wyrównanie środka placeholdera względem wysokości inputa */
+  left: 15px; /* Zachowanie odpowiedniego odstępu od lewej krawędzi */
+  transform: translateY(-50%); /* Wyrównanie w pionie */
+  font-family: monospace;
+  color: #555;
+  pointer-events: none; /* Placeholder nie będzie przechwytywał kliknięć */
+  z-index: 1;
+}
+input {
+  width: calc(100% - 24px); /* Dopasowuje szerokość do kontenera z marginesem na padding */
+  max-width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  font-family: monospace;
+  color: #0f0;
+  background: transparent;
+  border: 2px solid #0f0;
+  outline: none;
+  position: relative;
+}
+input::placeholder {
+  color: transparent; /* Hide the default placeholder */
+}
+button {
+  background: #0f0;
+  color: #000;
+  border: 1px solid #0f0;
+  padding: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+button:hover {
+  background: #0c0;
+}
+.spinner {
+  display: inline-block;
+  margin-left: 5px;
+  animation: spin 0.4s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(90deg); }
+  50% { transform: rotate(180deg); }
+  75% { transform: rotate(270deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.coming-soon {
+  text-align: center;
+  margin: 20px 0;
+  color: #0f0;
+  animation: pulse 4s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.8;
+    text-shadow: 0 0 10px #0f0, 0 0 20px #0c0;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 20px #0f0, 0 0 30px #0c0;
+  }
+  100% {
+    opacity: 0.8;
+    text-shadow: 0 0 10px #0f0, 0 0 20px #0c0;
+  }
+}
+
+/* Social Media */
+.social-links {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 20px;
+  z-index: 2;
+}
+.social-links a {
+  text-decoration: none;
+}
+.social-links img {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.social-links img:hover {
+  transform: scale(1.1);
+}
+
+/* Logo */
+.logo {
+  position: fixed;
+  top: -10px;
+  height: 180px;
+  z-index: 2;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2rem;
+  }
+  .hero p {
+    font-size: 1rem;
+  }
+  .hero button {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+  .console-container {
+    padding: 15px;
+    width: 90%;
+  }
+  .console-output {
+    height: 150px;
+  }
+  .social-links img {
+    width: 40px;
+    height: 40px;
+  }
+  .logo {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+  .hero p {
+    font-size: 0.9rem;
+  }
+  .hero button {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+  .console-container {
+    padding: 10px;
+  }
+  .console-output {
+    height: 120px;
+  }
+  .social-links img {
+    width: 35px;
+    height: 35px;
+  }
+  .logo {
+    height: 180px;
+  }
+}

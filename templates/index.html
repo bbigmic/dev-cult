@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devs Cult Console</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <!-- Canvas dla labiryntu -->
+  <canvas id="mazeCanvas"></canvas>
+
+  <!-- Logo -->
+  <img class="logo" src="https://i.ibb.co/M9FFwZp/image.png" alt="logo devs cult">
+
+  <!-- Komponent hero -->
+  <div class="hero" id="heroSection">
+    <h1>Welcome to Dev Cult</h1>
+    <p>Unleash your vision. Build your mission. Shape the future.</p>
+    <p onclick="copyCA()">CA: TBA (Click address to copy) </p>
+    <button onclick="location.href='https://www.pump.fun'">Go to pump.fun</button>
+  </div>
+
+  <!-- Konsola -->
+  <div class="console-container" id="consoleContainer">
+    <div class="console-output" id="consoleOutput">
+      <p>Welcome to Dev Cult Console! Share your vision with one sentence to get your mission.</p>
+    </div>
+    <div class="console-input">
+      <div style="position: relative; background-color: #121212;">
+        <input id="consoleInput" type="text" placeholder="Enter your vision..." autocomplete="off">
+          <div class="placeholder-animation" id="placeholderAnimation"></div>
+        </input>
+      </div>
+      <button onclick="generateMission()">Submit</button>
+    </div>
+  </div>
+
+  <div class="coming-soon" id="comingSoon">
+    <p>All will be revealed soon. Stay tuned.</p>
+  </div>
+
+
+  <!-- Ikony Social Media -->
+  <div class="social-links" id="socialLinks">
+    <a href="https://twitch.tv" target="_blank">
+      <img src="https://img.icons8.com/fluency/96/twitch.png" alt="Twitch">
+    </a>
+  </div>
+
+
+  <script>
+    const mazeCanvas = document.getElementById('mazeCanvas');
+    const mazeCtx = mazeCanvas.getContext('2d');
+    const heroSection = document.getElementById('heroSection');
+    const socialLinks = document.getElementById('socialLinks');
+
+    mazeCanvas.width = window.innerWidth;
+    mazeCanvas.height = window.innerHeight;
+
+    const cellSize = 20;
+    const cols = Math.floor(mazeCanvas.width / cellSize);
+    const rows = Math.floor(mazeCanvas.height / cellSize);
+
+    let maze = [];
+    let fragments = [];
+
+    // Generowanie losowego labiryntu
+    function generateMaze() {
+      maze = Array.from({ length: rows }, () =>
+        Array.from({ length: cols }, () => Math.random() > 0.7)
+      );
+    }
+
+    // Rysowanie labiryntu
+    function drawMaze() {
+      mazeCtx.clearRect(0, 0, mazeCanvas.width, mazeCanvas.height);
+
+      maze.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          if (cell) {
+            mazeCtx.fillStyle = '#0f0';
+            mazeCtx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+          }
+        });
+      });
+
+      fragments.forEach((fragment, index) => {
+        fragment.life--;
+        if (fragment.life <= 0) {
+          fragments.splice(index, 1);
+          return;
+        }
+        fragment.x += fragment.vx;
+        fragment.y += fragment.vy;
+        mazeCtx.fillStyle = 'rgba(0, 255, 0, ' + fragment.life / 100 + ')';
+        mazeCtx.fillRect(fragment.x, fragment.y, fragment.size, fragment.size);
+      });
+    }
+
+    // Dodawanie efektu rozpadu
+    function breakMazeArea(xStart, yStart, width, height) {
+      const radius = Math.max(width, height) / 2;
+      maze.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          const dx = x * cellSize + cellSize / 2 - (xStart + width / 2);
+          const dy = y * cellSize + cellSize / 2 - (yStart + height / 2);
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (cell && distance < radius) {
+            maze[y][x] = false;
+
+            for (let i = 0; i < 5; i++) {
+              fragments.push({
+                x: x * cellSize + Math.random() * cellSize,
+                y: y * cellSize + Math.random() * cellSize,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2,
+                size: Math.random() * 4 + 2,
+                life: 100,
+              });
+            }
+          }
+        });
+      });
+    }
+
+    // Rozpad elementów w hero i ikonach social media
+    function triggerInitialMazeBreak() {
+      const heroBounds = heroSection.getBoundingClientRect();
+      const socialBounds = socialLinks.getBoundingClientRect();
+      const comingSoonBounds = document.getElementById('comingSoon').getBoundingClientRect();
+
+      breakMazeArea(heroBounds.left, heroBounds.top, heroBounds.width, heroBounds.height);
+      breakMazeArea(socialBounds.left, socialBounds.top, socialBounds.width, socialBounds.height);
+      breakMazeArea(comingSoonBounds.left, comingSoonBounds.top, comingSoonBounds.width, comingSoonBounds.height);
+    }
+
+    // Śledzenie kursora
+    window.addEventListener('mousemove', (event) => {
+      breakMazeArea(event.clientX - 100, event.clientY - 100, 200, 200);
+    });
+
+    function moveMazeElements() {
+      const movableCells = [];
+
+      // Zbierz komórki, które mogą się poruszać
+      maze.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          if (cell) {
+            const directions = [];
+
+            // Sprawdź kierunki
+            if (x + 1 < cols && !maze[y][x + 1]) directions.push({ dx: 1, dy: 0 }); // Prawo
+            if (x - 1 >= 0 && !maze[y][x - 1]) directions.push({ dx: -1, dy: 0 }); // Lewo
+            if (y + 1 < rows && !maze[y + 1][x]) directions.push({ dx: 0, dy: 1 }); // Dół
+            if (y - 1 >= 0 && !maze[y - 1][x]) directions.push({ dx: 0, dy: -1 }); // Góra
+
+            if (directions.length > 0) {
+              movableCells.push({ x, y, directions });
+            }
+          }
+        });
+      });
+
+      // Losowo wybierz komórki do poruszenia
+      movableCells.sort(() => Math.random() - 0.5); // Wymieszaj
+      const moves = Math.min(5, movableCells.length); // Maksymalnie 5 ruchów na klatkę
+
+      for (let i = 0; i < moves; i++) {
+        const { x, y, directions } = movableCells[i];
+        const move = directions[Math.floor(Math.random() * directions.length)]; // Wybierz losowy kierunek
+
+        maze[y][x] = false; // Usuń element z obecnej pozycji
+        maze[y + move.dy][x + move.dx] = true; // Przenieś w wybranym kierunku
+      }
+    }
+
+
+    let frameCount = 0; // Licznik klatek
+    const moveInterval = 10;
+
+    // Animacja
+    function animate() {
+      frameCount++;
+
+      if (frameCount % moveInterval === 0) {
+        moveMazeElements(); // Przesuń losowe elementy
+      }
+      
+      drawMaze();
+      requestAnimationFrame(animate);
+    }
+
+    // Inicjalizacja
+    generateMaze();
+    triggerInitialMazeBreak();
+    animate();
+
+
+    // Obsługa zmiany rozmiaru okna
+    window.addEventListener('resize', () => {
+      mazeCanvas.width = window.innerWidth;
+      mazeCanvas.height = window.innerHeight;
+      generateMaze();
+      triggerInitialMazeBreak();
+    });
+
+
+
+    // Funkcja kopiowania CA
+    function copyCA() {
+      const contractAddress = "[TBA]";
+      navigator.clipboard.writeText(contractAddress).then(() => {
+        alert(`Contract Address ${contractAddress} copied to clipboard!`);
+      }).catch((error) => {
+        alert('Failed to copy Contract Address. Please try again.');
+      });
+    }
+
+        // Obsługa konsoli
+async function generateMission() {
+  const input = document.getElementById('consoleInput').value;
+  const outputElement = document.getElementById('consoleOutput');
+
+  if (!input.trim()) {
+    outputElement.innerHTML += '<p>&gt; Please enter a valid vision.</p>';
+    return;
+  }
+
+  // Dodaj input użytkownika do konsoli
+  outputElement.innerHTML += `<p>&gt; ${input}</p>`;
+  document.getElementById('consoleInput').value = '';
+
+  const spinnerLine = document.createElement('p');
+  spinnerLine.innerHTML = '&gt; <span class="spinner">/</span>';
+  outputElement.appendChild(spinnerLine);
+
+  try {
+    const response = await fetch('/generate-mission', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ vision: input }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const output = data.mission;
+
+      spinnerLine.remove();
+      await typeOutput(outputElement, `> ${output}`);
+
+      // Wywołanie logInteraction
+      logInteraction("dev_cult_user_123", input, output); // Przykładowe user_id
+    } else {
+      const error = await response.json();
+      spinnerLine.remove();
+      await typeOutput(outputElement, `> Error: ${error.error}`);
+    }
+  } catch (error) {
+    spinnerLine.remove();
+    await typeOutput(outputElement, `> Error: ${error.message}`);
+  }
+
+  outputElement.scrollTop = outputElement.scrollHeight;
+}
+
+
+    // Funkcja do dynamicznego wyświetlania tekstu
+    async function typeOutput(container, text, delay = 10) {
+      const line = document.createElement('p');
+      container.appendChild(line);
+
+      let currentHTML = ""; // Przechowuje renderowany tekst z HTML
+      for (let i = 0; i < text.length; i++) {
+        currentHTML += text[i];
+        line.innerHTML = currentHTML; // Zastosuj innerHTML
+        await new Promise(resolve => setTimeout(resolve, delay)); // Opóźnienie między literkami
+        container.scrollTop = container.scrollHeight; // Automatyczne przewijanie
+      }
+    }
+
+
+
+    async function logInteraction(userId, input, output) {
+      console.log("Sending data to /log:", { user_id: userId, input, output }); // Debugowanie
+      try {
+        const response = await fetch('/log', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ user_id: userId, input, output }),
+        });
+        const data = await response.json();
+        console.log("Response from server:", data); // Debugowanie
+      } catch (error) {
+        console.error('Failed to log interaction:', error);
+      }
+    }
+
+
+
+
+
+
+    const placeholderAnimation = document.getElementById("placeholderAnimation");
+    const inputField = document.getElementById("consoleInput");
+
+    const placeholderTexts = [
+      "Enter your vision...",
+      "What's your idea?",
+      "Share your thoughts!",
+    ];
+
+    let placeholderIndex = 0;
+    let charIndex = 0;
+    let isTyping = false;
+
+    // Function to animate placeholder text
+    function animatePlaceholder() {
+      if (isTyping) return; // Stop animation if the user is typing
+      const currentText = placeholderTexts[placeholderIndex];
+
+      if (charIndex < currentText.length) {
+        placeholderAnimation.textContent += currentText[charIndex];
+        charIndex++;
+        setTimeout(animatePlaceholder, 100); // Delay between letters
+      } else {
+        setTimeout(() => clearPlaceholder(), 2000); // Pause before clearing
+      }
+    }
+
+    // Function to clear placeholder text
+    function clearPlaceholder() {
+      if (isTyping) return; // Stop animation if the user is typing
+
+      if (charIndex > 0) {
+        placeholderAnimation.textContent = placeholderAnimation.textContent.slice(0, -1);
+        charIndex--;
+        setTimeout(clearPlaceholder, 50); // Delay between deleting letters
+      } else {
+        placeholderIndex = (placeholderIndex + 1) % placeholderTexts.length; // Next text
+        setTimeout(animatePlaceholder, 500); // Pause before next animation
+      }
+    }
+
+    // Start the animation
+    animatePlaceholder();
+
+    // Hide animation and stop it when the user types
+    inputField.addEventListener("input", () => {
+      if (inputField.value) {
+        isTyping = true;
+        placeholderAnimation.textContent = ""; // Clear placeholder immediately
+      } else {
+        isTyping = false;
+        animatePlaceholder(); // Restart animation if input is empty
+      }
+    });
+
+    inputField.addEventListener("focus", () => {
+      placeholderAnimation.style.opacity = 0.5;
+    });
+
+    inputField.addEventListener("blur", () => {
+      if (!inputField.value) {
+        placeholderAnimation.style.opacity = 1;
+      }
+    });
+  </script>
+</body>
+</html>

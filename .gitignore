@@ -1,0 +1,51 @@
+# Ignorowanie plików systemowych
+.DS_Store
+Thumbs.db
+
+# Ignorowanie środowiska wirtualnego
+venv/
+env/
+__pycache__/
+*.py[cod]
+
+# Ignorowanie plików logów
+*.log
+
+# Ignorowanie plików baz danych
+*.sqlite3
+*.db
+
+# Ignorowanie konfiguracji IDE/edytora
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ignorowanie plików związanych z cache
+*.egg-info/
+.eggs/
+*.cache
+.cache/
+
+# Ignorowanie plików tymczasowych i generowanych
+*.bak
+*.tmp
+*.out
+
+# Ignorowanie kluczy API lub wrażliwych danych
+*.env
+.env.local
+.env.*
+config.json
+*.key
+*.pem
+
+# Ignorowanie statycznych zasobów generowanych
+/static/*.map
+/static/build/
+staticfiles/
+node_modules/
+
+# Ignorowanie plików specyficznych dla Docker (jeśli projekt go używa)
+*.docker
+docker-compose.override.yml
