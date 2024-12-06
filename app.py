@@ -18,9 +18,9 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # Inicjalizacja aplikacji Flask
 app = Flask(__name__)
 
-# Klucz API OpenAI
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=OPENAI_API_KEY)
+# Pobranie klucza API ze zmiennych środowiskowych
+api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=api_key)
 
 
 # Funkcja tworzenia tabeli, jeśli nie istnieje
