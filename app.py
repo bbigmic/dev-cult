@@ -6,8 +6,6 @@ import os
 from psycopg2.extras import DictCursor
 
 
-# Wczytywanie zmiennych środowiskowych z pliku .env
-load_dotenv()
 
 # Ścieżka do PostgreSQL z .env
 DATABASE_URL = os.getenv("DATABASE_URL")
