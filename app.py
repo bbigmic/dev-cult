@@ -66,6 +66,8 @@ def generate_mission():
         mission = response.choices[0].message.content.strip()
         return jsonify({"mission": mission})
     except Exception as e:
+        # Dodanie szczegółów błędu do logów
+        app.logger.error(f"Error during OpenAI API call: {e}")
         return jsonify({"error": str(e)}), 500
 
 # Trasa do serwowania strony głównej
@@ -150,7 +152,18 @@ def test_log():
     except Exception as e:
         return f"Error: {str(e)}"
 
-
+@app.route('/test-openai', methods=['GET'])
+def test_openai():
+    try:
+        response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt="Test connection",
+            max_tokens=5
+        )
+        return jsonify({"success": True, "response": response})
+    except Exception as e:
+        app.logger.error(f"Test OpenAI API error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))  # Render udostępnia PORT w zmiennych środowiskowych
