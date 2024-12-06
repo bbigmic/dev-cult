@@ -4,13 +4,15 @@ from datetime import datetime
 import psycopg2
 import os
 from psycopg2.extras import DictCursor
-from dotenv import load_dotenv
+
 
 # Wczytywanie zmiennych środowiskowych z pliku .env
 load_dotenv()
 
 # Ścieżka do PostgreSQL z .env
 DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL is not set in the environment variables.")
 
 # Ścieżka do pliku bazy danych
 # DATABASE = "data/logs.db"
@@ -18,8 +20,11 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # Inicjalizacja aplikacji Flask
 app = Flask(__name__)
 
-# Pobranie klucza API ze zmiennych środowiskowych
+
+# Pobranie klucza API OpenAI ze zmiennych środowiskowych Render
 api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OPENAI_API_KEY is not set in the environment variables.")
 client = OpenAI(api_key=api_key)
 
 
