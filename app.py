@@ -8,7 +8,7 @@ from psycopg2.extras import DictCursor
 
 
 # Ścieżka do PostgreSQL z .env
-DATABASE_URL = DATABASE_URL
+DATABASE_URL = ("DATABASE_URL")
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL is not set in the environment variables.")
 
@@ -20,7 +20,7 @@ app = Flask(__name__)
 
 
 # Pobranie klucza API OpenAI ze zmiennych środowiskowych Render
-api_key = OPENAI_API_KEY
+api_key = ("OPENAI_API_KEY")
 if not api_key:
     raise ValueError("OPENAI_API_KEY is not set in the environment variables.")
 client = OpenAI(api_key=api_key)
