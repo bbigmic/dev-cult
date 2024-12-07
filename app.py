@@ -59,7 +59,15 @@ def generate_mission():
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "user", "content": f"User's vision: {vision}\nGenerate a mission based on this vision. Pull out a problem, a fact, a benefit, the tone should be like you're having a thought and you’re just writing what you’re thinking no emojis, no hashtags: Make it a coherent paragraph of text but keep it short, max 2 sentences. Make positive impact on reader in second sentence like achieving the mission is happening tomorrow and then after the 2 sentences create a mind map to visualize and accomplish the mission, making the user aware of the simplicity of achievement. (Format it using simple HTML tags, such as <h1>, <p>, or <br>, to enhance readability but dont say anything about this formating)"}
+                {
+                    "role": "user", "content": f"User's vision: {vision}\nGenerate a mission based on this vision. Pull out a problem, a fact, a benefit, the tone should be like you're having a thought and you’re just writing what you’re thinking no emojis, no hashtags: Make it a coherent paragraph of text but keep it short, max 2 sentences. Make positive impact on reader in second sentence like achieving the mission is happening tomorrow and then after the 2 sentences create a mind map to visualize and accomplish the mission, making the user aware of the simplicity of achievement. (Format it using simple HTML tags, such as <h1>, <p>, or <br>, to enhance readability but dont say anything about this formating)"
+                },
+                {
+                    "role": "user", "content": "If the user puts a "?" at the end, simply answer their question"
+                },
+                {
+                    "role": "user", "content": "Write in the language in which someone writes to you"
+                }
             ]
         )
         # Pobieranie treści misji
