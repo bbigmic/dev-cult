@@ -152,38 +152,37 @@
     });
 
     function moveMazeElements() {
-      const movableCells = [];
+        const movableCells = [];
 
-      // Zbierz komórki, które mogą się poruszać
-      maze.forEach((row, y) => {
-        row.forEach((cell, x) => {
-          if (cell) {
-            const directions = [];
+        // Zbierz komórki, które mogą się poruszać
+        maze.forEach((row, y) => {
+            row.forEach((cell, x) => {
+                if (cell) {
+                    const directions = [];
 
-            // Sprawdź kierunki
-            if (x + 1 < cols && !maze[y][x + 1]) directions.push({ dx: 1, dy: 0 }); // Prawo
-            if (x - 1 >= 0 && !maze[y][x - 1]) directions.push({ dx: -1, dy: 0 }); // Lewo
-            if (y + 1 < rows && !maze[y + 1][x]) directions.push({ dx: 0, dy: 1 }); // Dół
-            if (y - 1 >= 0 && !maze[y - 1][x]) directions.push({ dx: 0, dy: -1 }); // Góra
+                    // Sprawdź tylko kierunek w dół
+                    if (y + 1 < rows && !maze[y + 1][x]) {
+                        directions.push({ dx: 0, dy: 1 }); // Dół
+                    }
 
-            if (directions.length > 0) {
-              movableCells.push({ x, y, directions });
-            }
-          }
+                    if (directions.length > 0) {
+                        movableCells.push({ x, y, directions });
+                    }
+                }
+            });
         });
-      });
 
-      // Losowo wybierz komórki do poruszenia
-      movableCells.sort(() => Math.random() - 0.5); // Wymieszaj
-      const moves = Math.min(5, movableCells.length); // Maksymalnie 5 ruchów na klatkę
+        // Losowo wybierz komórki do poruszenia
+        movableCells.sort(() => Math.random() - 0.5); // Wymieszaj
+        const moves = Math.min(5, movableCells.length); // Maksymalnie 5 ruchów na klatkę
 
-      for (let i = 0; i < moves; i++) {
-        const { x, y, directions } = movableCells[i];
-        const move = directions[Math.floor(Math.random() * directions.length)]; // Wybierz losowy kierunek
+        for (let i = 0; i < moves; i++) {
+            const { x, y, directions } = movableCells[i];
+            const move = directions[0]; // Wybierz jedyny dostępny kierunek (dół)
 
-        maze[y][x] = false; // Usuń element z obecnej pozycji
-        maze[y + move.dy][x + move.dx] = true; // Przenieś w wybranym kierunku
-      }
+            maze[y][x] = false; // Usuń element z obecnej pozycji
+            maze[y + move.dy][x + move.dx] = true; // Przenieś w dół
+        }
     }
 
 
