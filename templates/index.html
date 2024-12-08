@@ -45,7 +45,7 @@
 
   <!-- Ikony Social Media -->
   <div class="social-links" id="socialLinks">
-    <a href="https://twitch.tv" target="_blank">
+    <a href="#" onclick="showAlert(); return false;" target="_blank">
       <!-- <img src="https://img.icons8.com/fluency/96/twitch.png" alt="Twitch"> -->
       <img src="https://img.icons8.com/6441a5/twitch" alt="Twitch">
     </a>
@@ -56,7 +56,7 @@
       <i class="fa-brands fa-telegram"></i>
     </a>
   </div>
-  <div style="color: #121212; bottom:5px;"><a target="_blank" href="https://icons8.com/icon/119322/telegram-app" style="color: #121212;text-decoration:none;cursor: default;">Social Media</a> icons by <a target="_blank" href="https://icons8.com" style="color: #121212;text-decoration:none;cursor: default;">Icons8</a></div>
+  <div style="color: #121212;"><a target="_blank" href="https://icons8.com/icon/119322/telegram-app" style="color: #121212;text-decoration:none;cursor: default;">Social Media</a> icons by <a target="_blank" href="https://icons8.com" style="color: #121212;text-decoration:none;cursor: default;">Icons8</a></div>
 
 
   <script>
@@ -379,6 +379,11 @@ async function generateMission() {
         placeholderAnimation.style.opacity = 1;
       }
     });
+
+    function showAlert() {
+        alert("Come back soon!");
+    }
+
   </script>
 </body>
 </html>
