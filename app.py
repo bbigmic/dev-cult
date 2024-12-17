@@ -46,6 +46,35 @@ def init_db():
 init_db()
 
 
+
+# In-memory storage for wallets (for demo purposes)
+connected_wallets = []
+
+@app.route('/connect-wallet', methods=['POST'])
+def connect_wallet():
+    data = request.get_json()
+    wallet_address = data.get('walletAddress')
+
+    if not wallet_address:
+        return jsonify({'error': 'No wallet address provided'}), 400
+
+    # Save or process wallet address
+    connected_wallets.append(wallet_address)
+    print(f"Connected wallet: {wallet_address}")
+
+    return jsonify({'message': 'Wallet connected successfully', 'walletAddress': wallet_address}), 200
+
+
+RPC_URL = "https://quick-solitary-morning.solana-mainnet.quiknode.pro/8fcb51eea08aa764101f7c07160ffb99241c543e"
+
+@app.route('/proxy-rpc', methods=['POST'])
+def proxy_rpc():
+    try:
+        response = requests.post(RPC_URL, json=request.json, headers={'Content-Type': 'application/json'})
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/generate-mission', methods=['POST'])
 def generate_mission():
     data = request.json
