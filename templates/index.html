@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/static/styles.css">
   <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
   <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.76.0/lib/index.iife.min.js"></script>
 </head>
 <body>
   <!-- Canvas dla labiryntu -->
@@ -42,6 +43,14 @@
     <p>All will be revealed soon. Stay tuned.</p>
   </div>
 
+    <!-- Connect Dashboard -->
+  <div id="walletConnect" class="wallet-container">
+    <button id="connectWalletButton">Connect Wallet</button>
+    <p id="walletAddress" style="display: none;">Connected Wallet: <span id="walletAddressText"></span></p>
+    <p id="tokenBalance" style="display: block;"></p>
+    <button id="createProfileButton" style="display: none;">Create Profile</button>
+    <p id="buyTokensMessage" style="display: none;">Purchase at least $10 MLN DEV to create a profile.</p>
+  </div>
 
   <!-- Ikony Social Media -->
   <div class="social-links" id="socialLinks">
@@ -385,5 +394,123 @@ async function generateMission() {
     }
 
   </script>
+
+  <script type="module">
+    async function sendWalletAddressToBackend(publicKey) {
+      try {
+        const response = await fetch('/connect-wallet', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ walletAddress: publicKey }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Wallet connected successfully:', data);
+          alert('Wallet connected.');
+        } else {
+          console.error('Failed to send wallet address to the server.');
+        }
+      } catch (error) {
+        console.error('Error sending wallet address:', error);
+      }
+    }
+
+    async function fetchSPLTokenBalance(walletAddress, tokenMintAddress) {
+      const connection = new solanaWeb3.Connection('https://quick-solitary-morning.solana-mainnet.quiknode.pro/8fcb51eea08aa764101f7c07160ffb99241c543e', 'confirmed');
+      try {
+        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+          new solanaWeb3.PublicKey(walletAddress),
+          { mint: new solanaWeb3.PublicKey(tokenMintAddress) }
+        );
+
+        if (tokenAccounts.value.length === 0) {
+          return 0; // Jeśli brak tokenów
+        }
+
+        const tokenBalance = tokenAccounts.value[0].account.data.parsed.info.tokenAmount.uiAmount;
+        return tokenBalance;
+      } catch (error) {
+        console.error('Failed to fetch SPL token balance:', error);
+        return null;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const connectWalletButton = document.getElementById('connectWalletButton');
+      const walletAddressText = document.getElementById('walletAddressText');
+      const walletAddressContainer = document.getElementById('walletAddress');
+      const tokenBalanceText = document.getElementById('tokenBalance');
+      const createProfileButton = document.getElementById('createProfileButton');
+      const buyTokensMessage = document.getElementById('buyTokensMessage');
+
+      let walletConnected = false;
+
+      async function connectWallet() {
+        if (!window.solana || !window.solana.isPhantom) {
+          alert('Please install or activate the Phantom wallet extension!');
+          return;
+        }
+
+        try {
+          const response = await window.solana.connect();
+          const publicKey = new solanaWeb3.PublicKey(response.publicKey).toString();
+          console.log('Wallet connected:', publicKey);
+
+          walletAddressText.textContent = publicKey;
+          walletAddressContainer.style.display = 'block';
+
+          // Pobierz balans tokena DEV
+          const tokenMintAddress = 'J3D728v2apramx6UydCVHfKtBC7wfKmc1YUHJJ6Ppump';
+          const tokenBalance = await fetchSPLTokenBalance(publicKey, tokenMintAddress);
+
+          if (tokenBalance !== null) {
+            tokenBalanceText.textContent = `DEV Token Balance: ${tokenBalance.toLocaleString()}`;
+
+            // Sprawdź warunek salda tokenów
+            if (tokenBalance >= 10000000) {
+              createProfileButton.style.display = 'block';
+              buyTokensMessage.style.display = 'none';
+            } else {
+              createProfileButton.style.display = 'none';
+              buyTokensMessage.style.display = 'block';
+            }
+          } else {
+            tokenBalanceText.textContent = 'Failed to fetch token balance.';
+            createProfileButton.style.display = 'none';
+            buyTokensMessage.style.display = 'block';
+          }
+
+          walletConnected = true;
+          connectWalletButton.textContent = 'Disconnect Wallet';
+        } catch (error) {
+          console.error('Wallet connection failed:', error);
+          alert('Failed to connect wallet. Please try again.');
+        }
+      }
+
+      function disconnectWallet() {
+        walletConnected = false;
+
+        walletAddressText.textContent = '';
+        walletAddressContainer.style.display = 'none';
+        tokenBalanceText.textContent = '';
+        createProfileButton.style.display = 'none';
+        buyTokensMessage.style.display = 'none';
+
+        connectWalletButton.textContent = 'Connect Wallet';
+      }
+
+      connectWalletButton.addEventListener('click', async () => {
+        if (walletConnected) {
+          disconnectWallet();
+        } else {
+          await connectWallet();
+        }
+      });
+    });
+    </script>
 </body>
 </html>
