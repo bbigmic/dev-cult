@@ -8,9 +8,10 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh; /* Zapewnia minimalną wysokość */
+  overflow: auto; /* Pozwala na przewijanie */
 }
+
 canvas {
   position: fixed;
   top: 0;
